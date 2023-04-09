@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facebook Page Finder</title>
+    <!-- Add Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.tailwindcss.com/css/tailwind.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mx-auto py-10">
+      <h1 class="text-4xl font-bold mb-5">Facebook Page Finder</h1>
+      <div class="mb-5">
+        <label for="url" class="block font-bold mb-2">Enter website URL:</label>
+        <input
+          type="text"
+          id="url"
+          name="url"
+          class="w-full border border-gray-400 py-2 px-3 rounded-md"
+        />
+      </div>
+      <button
+        id="scrape"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Scrape Contacts
+      </button>
+      <div id="result" class="mt-5"></div>
+    </div>
+    <script>
+      const options = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key":
+            "7be2edc43amsh04693265965626bp18a945jsn5c1cd4658d6b",
+          "X-RapidAPI-Host": "website-contacts-scraper.p.rapidapi.com",
+        },
+      };
+
+      const scrapeContacts = () => {
+        const url = document.getElementById("url").value;
+        fetch(
+          `https://website-contacts-scraper.p.rapidapi.com/scrape-contacts?query=${url}`,
+          options
+        )
+          .then((response) => response.json())
+          .then((response) => {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+
+            if (response.status === "OK") {
+              const data = response.data[0];
+              const domain = data.domain || "N/A";
+              const facebook = data.facebook || "N/A";
+              const github = data.github || "N/A";
+              const instagram = data.instagram || "N/A";
+              const linkedin = data.linkedin || "N/A";
+
+              const pDomain = document.createElement("p");
+              pDomain.innerText = `Domain: ${domain}`;
+              resultDiv.appendChild(pDomain);
+
+              const pFacebook = document.createElement("p");
+              const linkFacebook = document.createElement("a");
+              linkFacebook.href = facebook;
+              linkFacebook.textContent = facebook;
+              linkFacebook.target = "_blank"; // Add this line to open the link in a new tab
+              pFacebook.appendChild(linkFacebook);
+              resultDiv.appendChild(pFacebook);
+            } else {
+              const pError = document.createElement("p");
+              pError.innerText = `Error: ${response.error}`;
+              resultDiv.appendChild(pError);
+            }
+          })
+          .catch((err) => console.error(err));
+      };
+
+      document
+        .getElementById("scrape")
+        .addEventListener("click", scrapeContacts);
+    </script>
+  </body>
+</html>
